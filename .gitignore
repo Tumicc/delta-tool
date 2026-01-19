@@ -1,0 +1,70 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+delta-tool
+delta-tool-app
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Build artifacts
+build/bin
+frontend/dist
+
+# Dependency directories
+node_modules/
+
+# IDE and Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+
+# Wails build artifacts
+wails_build.log
+
+# Source data files (Excel)
+data/*.xlsx
+
+# Cache files
+data/weapon_codes_cache.json
+*.cache
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Claude Code files
+.claude/
+
+# Backup files
+*.backup
+*.bak

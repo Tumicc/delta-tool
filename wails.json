@@ -1,0 +1,20 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "delta-tool",
+  "outputfilename": "三角洲改枪码工具",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "Delta Tool",
+    "email": "info@delta-tool.com"
+  },
+  "info": {
+    "companyName": "Delta Tool",
+    "productName": "三角洲改枪码工具",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright...........",
+    "comments": "三角洲行动武器改装码查询工具"
+  }
+}
