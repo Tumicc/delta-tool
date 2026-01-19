@@ -7,10 +7,10 @@ import (
 
 // App struct
 type App struct {
-	ctx            context.Context
-	codeLoader     *WeaponCodeLoader
-	cacheManager   *CacheManager
-	enableExcel    bool // Set to true only in development mode
+	ctx          context.Context
+	codeLoader   *WeaponCodeLoader
+	cacheManager *CacheManager
+	enableExcel  bool // Set to true only in development mode
 }
 
 // NewApp creates a new App application struct
@@ -92,9 +92,12 @@ func (a *App) GetWeaponCodes() []WeaponCode {
 func (a *App) GetWeaponCodesFromDaoZai() []WeaponCode {
 	// Try loading from cache first
 	codes, found, err := a.cacheManager.Load()
+	fmt.Printf("[DEBUG] GetWeaponCodesFromDaoZai: found=%v, err=%v, cachePath=%s\n", found, err, a.cacheManager.GetCachePath())
 	if err == nil && found {
-		// Filter by source
-		return filterBySource(codes, "刀仔")
+		fmt.Printf("[DEBUG] Loaded %d codes from cache\n", len(codes))
+		result := filterBySource(codes, "刀仔")
+		fmt.Printf("[DEBUG] Filtered to %d codes from 刀仔\n", len(result))
+		return result
 	}
 
 	// If cache not found and Excel is enabled, load from Excel
@@ -121,9 +124,12 @@ func (a *App) GetWeaponCodesFromDaoZai() []WeaponCode {
 func (a *App) GetWeaponCodesFromWeaponMaster() []WeaponCode {
 	// Try loading from cache first
 	codes, found, err := a.cacheManager.Load()
+	fmt.Printf("[DEBUG] GetWeaponCodesFromWeaponMaster: found=%v, err=%v, cachePath=%s\n", found, err, a.cacheManager.GetCachePath())
 	if err == nil && found {
-		// Filter by source
-		return filterBySource(codes, "武器大师")
+		fmt.Printf("[DEBUG] Loaded %d codes from cache\n", len(codes))
+		result := filterBySource(codes, "武器大师")
+		fmt.Printf("[DEBUG] Filtered to %d codes from 武器大师\n", len(result))
+		return result
 	}
 
 	// If cache not found and Excel is enabled, load from Excel

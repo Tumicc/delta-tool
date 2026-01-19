@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -167,4 +168,89 @@ func (cm *CacheManager) ClearCache() error {
 
 	fmt.Printf("Cache file removed: %s\n", cm.cachePath)
 	return nil
+}
+
+// InitializeFromEmbedded initializes the cache from embedded data
+// On Windows: Skips initialization (NSIS installer copies data\weapon_codes.json)
+// On macOS/Linux: Extracts embedded JSON to user config directory on first run
+func (cm *CacheManager) InitializeFromEmbedded(data []byte) error {
+	if len(data) == 0 {
+		return fmt.Errorf("no embedded data provided")
+	}
+
+	// On Windows, NSIS installer will copy the file, so we don't need to extract
+	// Just set the cache path correctly
+	if runtime.GOOS == "windows" {
+		cm.cachePath = cm.getWritableCachePath()
+		return nil
+	}
+
+	// On macOS/Linux, extract embedded data to user config directory
+	cachePath := cm.getWritableCachePath()
+	cm.cachePath = cachePath
+
+	// Check if cache file already exists at the writable location
+	if _, err := os.Stat(cachePath); err == nil {
+		// Cache file exists, verify it's valid
+		return nil
+	}
+
+	// Ensure directory exists
+	dir := filepath.Dir(cachePath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("failed to create cache directory: %w", err)
+	}
+
+	// Write embedded data to cache file
+	if err := os.WriteFile(cachePath, data, 0644); err != nil {
+		return fmt.Errorf("failed to write embedded cache: %w", err)
+	}
+
+	fmt.Printf("Initialized cache from embedded data: %s\n", cachePath)
+	return nil
+}
+
+// getWritableCachePath returns a writable path for the cache file
+// On Windows: <InstallDir>\data\weapon_codes.json (from executable directory)
+// On macOS: ~/Library/Application Support/delta-tool/weapon_codes.json
+// On Linux: ~/.config/delta-tool/weapon_codes.json
+func (cm *CacheManager) getWritableCachePath() string {
+	// On Windows, use executable directory\data subdirectory
+	if runtime.GOOS == "windows" {
+		exePath, err := os.Executable()
+		if err == nil {
+			exeDir := filepath.Dir(exePath)
+			return filepath.Join(exeDir, "data", CacheFileName)
+		}
+	}
+
+	// On macOS/Linux, use user config directory
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		// Fallback to executable directory if home dir not available
+		return cm.getExecutableDirPath()
+	}
+
+	var configDir string
+	switch runtime.GOOS {
+	case "darwin":
+		// macOS: ~/Library/Application Support/delta-tool
+		configDir = filepath.Join(homeDir, "Library", "Application Support", "delta-tool")
+	default: // Linux and others (freebsd, openbsd, etc.)
+		// Linux: ~/.config/delta-tool
+		configDir = filepath.Join(homeDir, ".config", "delta-tool")
+	}
+
+	return filepath.Join(configDir, CacheFileName)
+}
+
+// getExecutableDirPath returns the path relative to executable directory
+func (cm *CacheManager) getExecutableDirPath() string {
+	exePath, err := os.Executable()
+	if err != nil {
+		// Last resort: current working directory
+		return CacheFileName
+	}
+	exeDir := filepath.Dir(exePath)
+	return filepath.Join(exeDir, CacheFileName)
 }

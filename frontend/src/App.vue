@@ -24,7 +24,7 @@ watch(selectedDataSource, () => {
 
 onMounted(() => {
   const checkWailsReady = () => {
-    if ((window as any).go && (window as any).go.main && (window as any).go.main.App) {
+    if ((window as any).go && (window as any).go.app && (window as any).go.app.App) {
       weaponStore.loadCodes()
     } else {
       setTimeout(checkWailsReady, 100)

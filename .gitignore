@@ -19,6 +19,10 @@ go.work.sum
 
 # Build artifacts
 build/bin
+build/darwin-amd64
+build/darwin-arm64
+build/windows-amd64
+build/windows-installer
 frontend/dist
 
 # Dependency directories
@@ -68,3 +72,11 @@ desktop.ini
 # Backup files
 *.backup
 *.bak
+
+# Icons and generated assets (root level only)
+/appicon.ico
+/appicon.png
+
+# Generated NSIS files (keep templates)
+build/windows/installer/wails_tools.nsh
+build/windows/installer/project.nsi

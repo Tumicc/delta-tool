@@ -71,8 +71,12 @@ export const useWeaponStore = defineStore('weapons', () => {
   // Load weapon codes from backend
   const loadCodes = async () => {
     // Check if Wails runtime is ready
-    if (!(window as any).go || !(window as any).go.main || !(window as any).go.main.App) {
-      console.error('Wails runtime not ready')
+    if (!(window as any).go || !(window as any).go.app || !(window as any).go.app.App) {
+      console.error('[DEBUG] Wails runtime not ready', {
+        go: !!(window as any).go,
+        app: !!(window as any).go?.app,
+        App: !!(window as any).go?.app?.App
+      })
       codes.value = []
       return
     }
@@ -82,16 +86,24 @@ export const useWeaponStore = defineStore('weapons', () => {
       let result: WeaponCode[]
 
       // Load based on selected data source
+      console.log('[DEBUG] Loading codes from data source:', selectedDataSource.value)
       if (selectedDataSource.value === '刀仔') {
-        result = await (window as any).go.main.App.GetWeaponCodesFromDaoZai()
+        result = await (window as any).go.app.App.GetWeaponCodesFromDaoZai()
       } else {
-        result = await (window as any).go.main.App.GetWeaponCodesFromWeaponMaster()
+        result = await (window as any).go.app.App.GetWeaponCodesFromWeaponMaster()
       }
+
+      console.log('[DEBUG] Received result:', {
+        type: typeof result,
+        isArray: Array.isArray(result),
+        length: Array.isArray(result) ? result.length : 'N/A',
+        firstItem: Array.isArray(result) && result.length > 0 ? result[0] : null
+      })
 
       // Ensure result is always an array
       codes.value = Array.isArray(result) ? result : []
     } catch (error) {
-      console.error('Failed to load weapon codes:', error)
+      console.error('[DEBUG] Failed to load weapon codes:', error)
       codes.value = []
     } finally {
       loading.value = false
